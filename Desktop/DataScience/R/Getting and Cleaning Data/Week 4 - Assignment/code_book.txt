@@ -10,7 +10,7 @@
 	- 5 STANDING
 	- 6 LAYING
 
-All the abelow variables have the average value of group for each activity and each subject.
+All thebelow variables have the average value of groups for each activity and each subject.
 
 "3" "tBodyAcc-mean()-X"
 "4" "tBodyAcc-mean()-Y"
