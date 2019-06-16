@@ -1,0 +1,149 @@
+---
+title: "Getting and Cleaning Data"
+output: Course #3 - Week 4 Quiz
+---
+Question #1
+
+The American Community Survey distributes downloadable data about United States communities. Download the 2006 microdata survey about housing for the state of Idaho using download.file() from here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv
+
+and load the data into R. The code book, describing the variable names is here:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FPUMSDataDict06.pdf
+
+Apply strsplit() to split all the names of the data frame on the characters "wgtp". What is the value of the 123 element of the resulting list?
+
+```{r}
+# Get and set the current working directory to read the input file
+getwd()
+setwd("C:\\Users\\Ishwa\\Desktop\\DataScience\\R\\Getting and Cleaning Data")
+
+# Read teh input file and explore the  data
+Idaho_housing <- read.csv("Idaho housing data 2006.csv")
+head(Idaho_housing)
+
+# Split the names of the dataframe and get the 123 rd element
+names_Id_hous<- names(Idaho_housing)
+strsplit(names_Id_hous,"wgtp")[[123]]
+```
+Question #2
+
+Load the Gross Domestic Product data for the 190 ranked countries in this data set:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv
+
+Remove the commas from the GDP numbers in millions of dollars and average them. What is the average?
+
+Original data sources:
+
+http://data.worldbank.org/data-catalog/GDP-ranking-table
+```{r}
+# Load the stringr library
+library(stringr)
+
+# Load the GDP data, take care of the title , header lines, and the additional data at the bottome of the file
+GDP_data <- read.csv("getdata_data_GDP.csv", header=FALSE, skip=5, sep=",",  nrows=190, colClasses = c("character", "character", "NULL", "character", "character", rep("NULL",5)))
+names(GDP_data) <- c("CountryCode","Ranking","Economy", "GDPValue")
+
+# View the rows in the loaded dataframe
+head(GDP_data$GDPValue)
+
+# Remove the , from the GDP value as well as the leading and trailing spaces
+GDP_data$GDPValue<- str_trim(gsub(",","",GDP_data$GDPValue))
+
+# Convert the character value into numeric
+value <- as.numeric(GDP_data$GDPValue)
+
+# Find the mean fo the GDPvalue variable
+mean(value, na.rm=TRUE)
+
+```
+Question #3
+
+In the data set from Question 2 what is a regular expression that would allow you to count the number of countries whose name begins with "United"? Assume that the variable with the country names in it is named countryNames. How many countries begin with United?
+
+```{r}
+
+# Rename the columns in the GDP_Data
+names(GDP_data) <- c("countryCode","ranking","countryNames", "GDPValue")
+head(GDP_data)
+
+# Get the column names that start with United
+grep("^United",GDP_data$countryNames)
+
+```
+Question #4
+
+Load the Gross Domestic Product data for the 190 ranked countries in this data set:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv
+
+Load the educational data from this data set:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FEDSTATS_Country.csv
+
+Match the data based on the country shortcode. Of the countries for which the end of the fiscal year is available, how many end in June?
+
+Original data sources:
+
+http://data.worldbank.org/data-catalog/GDP-ranking-table
+
+http://data.worldbank.org/data-catalog/ed-stats
+
+```{r}
+
+# Load the GDP data, take care of the title , header lines, and the additional data at the bottome of the file
+GDP <- read.csv("GDP.csv", header=FALSE, skip=5, sep=",",  nrows=190, colClasses = c("character", "character", "NULL", "character", "character", rep("NULL",5)))
+names(GDP) <- c("CountryCode","Ranking","Economy", "GDPValue")
+
+# Load the educational data
+EDU <- read.csv("EDSTATS.csv")
+EDU$Special.Notes
+
+# FIlter the rows which has Fisical year end Special Notes
+EDU_fyear <- EDU[grep("Fiscal year end",EDU$Special.Notes),]
+EDU_fyear$Special.Notes
+
+# Merge the GDP and EDU data by CountryCode
+GDP_EDU <- merge(GDP, EDU_fyear, by= "CountryCode")
+
+# Get the row count for Fiscal year ending in June
+dim(GDP_EDU[grep("Fiscal year end: June", GDP_EDU$Special.Notes),])[1]
+
+```
+
+Question #5
+
+You can use the quantmod (http://www.quantmod.com/) package to get historical stock prices for publicly traded companies on the NASDAQ and NYSE. Use the following code to download data on Amazon's stock price and get the times the data was sampled.
+
+How many values were collected in 2012? How many values were collected on Mondays in 2012?
+
+```{r}
+# Install and load the quantmod package
+
+#install.packages("quantmod")
+library(quantmod)
+
+# Get the stock data for amazon and explore the data
+amzn = getSymbols("AMZN",auto.assign=FALSE)
+head(amzn)
+tail(amzn)
+
+# Get the amaon data for the year 2012
+sampleTimes = index(amzn)
+class(sampleTimes)
+sampleTimes_2012 <- (sampleTimes[(sampleTimes>="2012-01-01" & sampleTimes < "2013-01-01")])
+
+# Load the lubridate library
+library(lubridate)
+
+# Get the weekday for all the dates from 2012 and get the count
+SampleDays_2012 <-(wday(sampleTimes_2012, label=TRUE))
+length (SampleDays_2012)
+
+# Get the count for Monday in 2012
+length(SampleDays_2012[SampleDays_2012 == "Mon"])
+
+```
+
