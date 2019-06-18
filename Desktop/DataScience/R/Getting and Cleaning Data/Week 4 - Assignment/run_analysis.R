@@ -1,7 +1,20 @@
 library(dplyr)
 
-getwd()
-setwd("C:\\Users\\Ishwa\\Desktop\\DataScience\\R\\Getting and Cleaning Data\\getdata_projectfiles_UCI HAR Dataset\\UCI HAR Dataset")
+# *************************** GET THE DATA *********************************************
+
+setwd("C:\\Users\\Ishwa\\Desktop\\DataScience\\R\\Getting and Cleaning Data")
+path <- getwd()
+
+url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+
+f <- "getdata_projectfiles_UCI HAR Dataset.zip"
+if (!file.exists(path)) {dir.create(path)}
+download.file(url, file.path(path, f))
+
+setwd("C:\\Users\\Ishwa\\Desktop\\DataScience\\R\\Getting and Cleaning Data\\getdata_projectfiles_UCI HAR Dataset\\UCI HAR Dataset") 
+path <- getwd()
+
+unzip(f,exdir=path)
 
 # ******************* LOAD THE REQUIRED INPUR FILES *****************************
 
